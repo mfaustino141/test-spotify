@@ -1,0 +1,27 @@
+# Ignore virtual environment
+.venv/
+myenv/
+
+# Ignore Python bytecode
+web_app/__pycache__/
+spotify_wrapped/__pycache__/
+__pycache__/
+*.pyc
+
+# Ignore IDE configurations
+.idea/
+
+# Environment variables and database files
+.env
+db.sqlite3
+
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Mac system files
+.DS_Store
+
+# CSS output
+web_app/static/css/output.css

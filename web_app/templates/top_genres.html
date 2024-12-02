@@ -1,0 +1,350 @@
+<!DOCTYPE html> 
+
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Top Genres</title> 
+    <style> 
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+        } 
+ 
+        body { 
+            min-height: 100vh; 
+            background: linear-gradient(180deg, #500750 0%, #4c0747 50%, #450740 100%); 
+            color: white; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 2rem 1rem; 
+            overflow-x: hidden; 
+        } 
+ 
+        .background-glow { 
+            position: fixed; 
+            width: 600px; 
+            height: 600px; 
+            border-radius: 50%; 
+            background: radial-gradient(circle, rgba(29, 215, 96, 0.2) 0%, transparent 70%); 
+            animation: float 8s infinite ease-in-out; 
+            pointer-events: none; 
+            z-index: 1; 
+        } 
+ 
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            position: relative; 
+            z-index: 2; 
+        } 
+ 
+        .header { 
+            text-align: center; 
+            margin-bottom: 2rem; 
+            opacity: 0; 
+            animation: slideDown 0.5s ease-out forwards; 
+        } 
+ 
+        .title { 
+            font-size: 2.5rem; 
+            font-weight: bold; 
+            margin-bottom: 0.5rem; 
+            background: linear-gradient(90deg, #1ED760, #fff); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        } 
+ 
+        .subtitle { 
+            font-size: 1.2rem; 
+            opacity: 0.9; 
+        } 
+ 
+        .podium { 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-end; 
+            gap: 1rem; 
+            margin-top: 2rem; 
+        } 
+ 
+        .podium-position { 
+            position: relative; 
+            width: 100px; 
+            background: rgba(0, 0, 0, 0.3); 
+            backdrop-filter: blur(10px); 
+            border-radius: 8px 8px 0 0; 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 1rem; 
+            overflow: hidden; 
+            transform: translateX(-100%); 
+            animation: slideInRight 0.5s ease-out forwards; 
+            transition: transform 0.3s ease, box-shadow 0.3s ease; 
+        } 
+ 
+        .podium-position:hover { 
+            transform: translateX(0) scale(1.02) !important; 
+            box-shadow: 0 0 20px rgba(29, 215, 96, 0.2); 
+        } 
+ 
+        .podium-position::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent); 
+            transform: translateX(-100%); 
+            transition: transform 0.5s ease; 
+        } 
+ 
+        .podium-position:hover::before { 
+            transform: translateX(100%); 
+        } 
+ 
+        .rank { 
+            font-size: 2rem; 
+            font-weight: bold; 
+            color: #1ED760; 
+            text-shadow: 0 0 10px rgba(29, 215, 96, 0.3); 
+            margin-bottom: 1rem; 
+        } 
+ 
+        .genre-name { 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+        } 
+ 
+        .next-button-container { 
+            display: flex; 
+            justify-content: center; 
+            margin-top: 2rem; 
+        } 
+         
+        .next-button { 
+            display: inline-flex; 
+            align-items: center; 
+            background: linear-gradient(90deg, #1ED760, #17c15e); 
+            color: white; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 1.25rem; 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 50px; 
+            box-shadow: 0 4px 10px rgba(29, 215, 96, 0.3); 
+            transition: transform 0.2s ease, box-shadow 0.2s ease; 
+        } 
+         
+        .next-button:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 6px 15px rgba(29, 215, 96, 0.4); 
+        } 
+         
+        .next-button .icon { 
+            width: 24px; 
+            height: 24px; 
+            margin-left: 0.5rem; 
+            transition: transform 0.2s ease; 
+        } 
+         
+        .next-button:hover .icon { 
+            transform: translateX(5px); 
+        } 
+ 
+        @keyframes float { 
+            0%, 100% { transform: translate(0, 0); } 
+            50% { transform: translate(30px, -30px); } 
+        } 
+ 
+        @keyframes slideDown { 
+            from { 
+                opacity: 0; 
+                transform: translateY(-20px); 
+            } 
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            } 
+        } 
+ 
+        @keyframes slideInRight { 
+            from { 
+                opacity: 0; 
+                transform: translateX(-100%); 
+            } 
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            } 
+        } 
+ 
+        /* Sliding out animation */ 
+        @keyframes slideOut { 
+            0% { 
+                transform: translateX(0); 
+            } 
+            100% { 
+                transform: translateX(-100%); 
+            } 
+        } 
+ 
+        .page-exit { 
+            animation: slideOut 0.5s forwards; 
+        } 
+ 
+        /* Sliding in animation */ 
+        @keyframes slideIn { 
+            0% { 
+                transform: translateX(100%); 
+            } 
+            100% { 
+                transform: translateX(0); 
+            } 
+        } 
+ 
+        .page-enter { 
+            animation: slideIn 0.5s forwards; 
+        } 
+    </style> 
+</head> 
+<body> 
+    <div class="background-glow"></div> 
+    <div class="container"> 
+        <header class="header"> 
+            <h1 class="title">Top Genres</h1> 
+            <p class="subtitle">Here are your top genres this year</p> 
+        </header> 
+         
+        <div class="podium"> 
+            <div id="podium-2" class="podium-position" style="animation-delay: 0.1s;"> 
+                <div class="rank">#2</div> 
+                <div class="genre-name">Pop</div> 
+            </div> 
+            <div id="podium-1" class="podium-position" style="animation-delay: 0s;"> 
+                <div class="rank">#1</div> 
+                <div class="genre-name">Hip-Hop</div> 
+            </div> 
+            <div id="podium-3" class="podium-position" style="animation-delay: 0.2s;"> 
+                <div class="rank">#3</div> 
+                <div class="genre-name">Indie</div> 
+            </div> 
+        </div> 
+
+        <div id="artists-list"></div>
+ 
+        <div class="next-button-container"> 
+            <a href="/top-songs/" class="next-button"> 
+                Next 
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> 
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /> 
+                </svg> 
+            </a> 
+        </div> 
+    </div> 
+ 
+    <script> 
+        function getTopArtists() {
+            const url = '/api/top-artists/';
+            
+            fetch(url)
+                .then(response => response.json())  // Parse the JSON response
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error:', data.error);
+                        return;
+                    }
+                    // Extract genres and count their frequency
+                    const allGenres = extractGenres(data.items);
+                    console.log(allGenres);
+
+                    // Count genre frequency
+                    const genreCounts = countGenres(allGenres);
+                    console.log(genreCounts)
+                    
+                    // Sort genres by frequency in descending order
+                    const sortedGenres = sortGenresByFrequency(genreCounts);
+                    console.log(sortedGenres)
+                    // Display the most common genres
+                    displayGenres(sortedGenres);
+                })
+                .catch(error => {
+                    console.error('Request failed', error);
+                });
+        }
+
+        getTopArtists();
+        
+        function extractGenres(artists) {
+            let genres = [];
+            artists.forEach(artist => {
+                // Add the artist's genres to the genres array
+                genres = genres.concat(artist.genres);
+            });
+            return genres;
+        }
+        
+        function countGenres(genres) {
+            const genreCounts = {};
+            genres.forEach(genre => {
+                genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+            });
+            return genreCounts;
+        }
+
+        function sortGenresByFrequency(genreCounts) {
+            const sortedGenres = Object.entries(genreCounts)
+                .sort(([, countA], [, countB]) => countB - countA) // Sort by count in descending order
+                .map(([genre]) => genre); // Get only the genre names
+            return sortedGenres;
+        }
+
+        function displayGenres(genres) {
+            const podium1 = document.getElementById('podium-1');
+            const podium2 = document.getElementById('podium-2');
+            const podium3 = document.getElementById('podium-3');
+        
+            if (genres.length >= 3) {
+                podium1.querySelector('.genre-name').textContent = genres[0];
+                podium2.querySelector('.genre-name').textContent = genres[1];
+                podium3.querySelector('.genre-name').textContent = genres[2];
+            } else {
+                podium1.querySelector('.genre-name').textContent = genres[0] || 'N/A';
+                podium2.querySelector('.genre-name').textContent = genres[1] || 'N/A';
+                podium3.querySelector('.genre-name').textContent = genres[2] || 'N/A';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => { 
+            document.body.classList.add('page-enter'); 
+        }); 
+     
+        // Handle navigation with slide-out animation 
+        document.querySelectorAll('a').forEach(link => { 
+            link.addEventListener('click', event => { 
+                event.preventDefault(); // Prevent immediate navigation 
+                const href = event.currentTarget.getAttribute('href'); // Get link target 
+     
+                // Add slide-out class to body 
+                document.body.classList.add('page-exit'); 
+     
+                // Delay navigation until the animation ends 
+                setTimeout(() => { 
+                    window.location.href = href; 
+                }, 500); // Match the animation duration 
+            }); 
+        }); 
+    </script> 
+</body> 
+</html> 
+
+ 
+
+ 

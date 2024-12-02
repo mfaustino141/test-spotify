@@ -1,0 +1,242 @@
+:root {
+    --background-color: #23063A;
+    --text-color: #FCF3E4;
+    --form-container-color: #BB129C;
+    --button-background: #3B0F46;
+    --button-text: #E8DDCA;
+    --banner-color: #BC7AFF;
+}
+
+.light-mode {
+    --background-color: #503762;
+    --text-color: #333;
+    --form-container-color: #e7a4d4;
+    --button-background: #a58ea9;
+    --button-text: #333;
+    --banner-color: #e4c4ff;
+}
+
+/* Base styles with transitions */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    position: relative;
+    min-height: 100vh;
+}
+
+body.light-mode {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+/* Background designs */
+.background-design-1,
+.background-design-2,
+.background-design-3,
+.background-design-4,
+.background-design-5 {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: 1;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.background-design-1 {
+    top: 10%;
+    left: 20%;
+    background: var(--form-container-color);
+    animation: float 8s infinite;
+}
+
+.background-design-2 {
+    top: 50%;
+    right: 15%;
+    background: var(--button-background);
+    animation: float 10s infinite;
+}
+
+.background-design-3 {
+    bottom: 15%;
+    left: 30%;
+    background: var(--form-container-color);
+    animation: float 9s infinite;
+}
+
+.background-design-4 {
+    top: 30%;
+    left: 60%;
+    background: var(--button-background);
+    animation: float 11s infinite;
+}
+
+.background-design-5 {
+    bottom: 30%;
+    right: 30%;
+    background: var(--form-container-color);
+    animation: float 12s infinite;
+}
+
+@keyframes float {
+    0% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(-10px, 10px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 120px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 1000;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.theme-toggle:hover {
+    opacity: 0.8;
+}
+
+.theme-toggle .icon {
+    width: 1.8rem;
+    height: 1.8rem;
+}
+
+/* Banner styles */
+.banner {
+    background-color: var(--banner-color) !important;
+    transition: background-color 0.3s ease;
+}
+
+.wave {
+    color: var(--banner-color);
+    transition: color 0.3s ease;
+}
+
+/* Box container styles */
+.box-container {
+    position: relative;
+    z-index: 2;
+    background-color: var(--form-container-color);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    color: var(--text-color);
+}
+
+body.light-mode .box-container {
+    background-color: var(--form-container-color);
+    color: var(--text-color);
+}
+
+/* Button styles */
+.button {
+    background-color: var(--button-background);
+    color: var(--button-text);
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+body.light-mode .button {
+    background-color: var(--button-background);
+    color: var(--button-text);
+}
+
+.button:hover {
+    opacity: 0.9;
+}
+
+/* Input field styles */
+.input-field {
+    background: none;
+    border: none;
+    border-bottom: 2px solid var(--text-color);
+    color: var(--text-color);
+    padding: 0.5rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    outline: none;
+    transition: all 0.3s ease;
+    font-size: 15px;
+}
+
+body.light-mode .input-field {
+    border-bottom-color: var(--text-color);
+    color: var(--text-color);
+}
+
+/* Profile link */
+.profile-link {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+body.light-mode .profile-link {
+    color: var(--text-color);
+}
+
+.profile-link:hover {
+    text-decoration: underline;
+}
+
+/* Back button */
+.back-button {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+    cursor: pointer;
+    font-size: 1.5rem;
+}
+
+body.light-mode .back-button {
+    color: var(--text-color);
+}
+
+/* Choice container text */
+#choice-container h2,
+#choice-container p {
+    color: var(--text-color);
+}
+
+body.light-mode #choice-container h2,
+body.light-mode #choice-container p,
+body.light-mode .box-container h2 {
+    color: var(--text-color);
+}
+
+/* SVG wave color */
+path[fill="#BC7AFF"] {
+    transition: fill 0.3s ease;
+}
+
+body.light-mode path[fill="#BC7AFF"] {
+    fill: var(--banner-color);
+}

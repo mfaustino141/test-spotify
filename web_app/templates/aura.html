@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Your Spotify Acts</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #500750 0%, #4c0747 50%, #450740 100%);
+            color: white;
+            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .background-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(29, 215, 96, 0.2) 0%, transparent 70%);
+            animation: float 8s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .background-glow:nth-child(2) {
+            background: radial-gradient(circle, rgba(155, 77, 224, 0.2) 0%, transparent 70%);
+            animation-delay: -4s;
+            left: 20%;
+        }
+
+        .background-glow:nth-child(3) {
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.2) 0%, transparent 70%);
+            animation-delay: -2s;
+            right: 20%;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(29, 215, 96, 0.1) 0%, transparent 50%);
+            animation: rotate 15s linear infinite;
+        }
+
+        .header {
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #1ED760, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .personality-type {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin: 2rem 0;
+            color: #1ED760;
+            text-shadow: 0 0 20px rgba(29, 215, 96, 0.3);
+            opacity: 0;
+            transform: scale(0.5);
+            animation: popIn 0.5s ease-out forwards 0.5s;
+        }
+
+        .trait-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .trait {
+            opacity: 0;
+            animation: slideUp 0.5s ease-out forwards;
+            position: relative;
+            padding: 1.5rem;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .trait:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(29, 215, 96, 0.2);
+        }
+
+        .trait:nth-child(1) { animation-delay: 1s; }
+        .trait:nth-child(2) { animation-delay: 1.2s; }
+        .trait:nth-child(3) { animation-delay: 1.4s; }
+        .trait:nth-child(4) { animation-delay: 1.6s; }
+
+        .trait-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #1ED760;
+        }
+
+        .trait-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .trait-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        .mood-ring {
+            width: 200px;
+            height: 200px;
+            margin: 2rem auto;
+            border-radius: 50%;
+            position: relative;
+            opacity: 0;
+            animation: rotate 10s linear infinite, fadeIn 0.5s ease-out forwards 2s;
+            box-shadow: 0 0 30px rgba(29, 215, 96, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .mood-ring:hover {
+            transform: scale(1.05);
+        }
+
+        .mood-ring::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .mood-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #1ED760;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .next-button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .next-button {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(90deg, #1ED760, #17c15e);
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.25rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(29, 215, 96, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .next-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(29, 215, 96, 0.4);
+        }
+        
+        .next-button .icon {
+            width: 24px;
+            height: 24px;
+            margin-left: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .next-button:hover .icon {
+            transform: translateX(5px);
+        }
+
+        /* Sliding out animation */
+        @keyframes slideOut {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .page-exit {
+            animation: slideOut 0.5s forwards;
+        }
+
+        /* Sliding in animation */
+        @keyframes slideIn {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .page-enter {
+            animation: slideIn 0.5s forwards;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -30px); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes popIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes sparkle {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            50% { transform: scale(1) rotate(180deg); opacity: 1; }
+            100% { transform: scale(0) rotate(360deg); opacity: 0; }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 2rem;
+            }
+            .personality-type {
+                font-size: 2.5rem;
+            }
+            .trait-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .mood-ring {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles"></div>
+    <div class="background-glow"></div>
+    <div class="background-glow"></div>
+    <div class="background-glow"></div>
+    <div class="container">
+        <div class="card">
+            <header class="header">
+                <h1 class="title">Your Audio Aura</h1>
+                <p>Based on your listening habits this year</p>
+            </header>
+
+            <div class="personality-type">The Eclectic Enthusiast</div>
+            
+            <div class="mood-ring">
+                <div class="mood-label">
+                    Your Mood Mix<br>
+                    <span style="font-size: 0.8rem; opacity: 0.8">Dancing between genres</span>
+                </div>
+            </div>
+
+            <div class="trait-container">
+                <div class="trait">
+                    <div class="trait-title">Energy Level</div>
+                    <div class="trait-value">87%</div>
+                    <div class="trait-description">You keep the party going with high-energy tracks</div>
+                </div>
+
+                <div class="trait">
+                    <div class="trait-title">Genre Fluidity</div>
+                    <div class="trait-value">92%</div>
+                    <div class="trait-description">Your playlist knows no boundaries</div>
+                </div>
+
+                <div class="trait">
+                    <div class="trait-title">Discovery Rate</div>
+                    <div class="trait-value">73%</div>
+                    <div class="trait-description">Always on the hunt for fresh sounds</div>
+                </div>
+
+                <div class="trait">
+                    <div class="trait-title">Rhythm Match</div>
+                    <div class="trait-value">95%</div>
+                    <div class="trait-description">Your beats sync perfectly with your mood</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="next-button-container">
+            <a href="/friends" class="next-button">
+                Next
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Mood ring animation
+        const moodRing = document.querySelector('.mood-ring');
+        let hue = 0;
+
+        function updateMoodRingColors() {
+            hue = (hue + 1) % 360;
+            const gradient = `conic-gradient(
+                from ${hue}deg,
+                #1ED760,
+                #9B4DE0,
+                #FF6B6B,
+                #FFD93D,
+                #1ED760
+            )`;
+            moodRing.style.background = gradient;
+            requestAnimationFrame(updateMoodRingColors);
+        }
+
+        updateMoodRingColors();
+
+        // Sparkle effect
+        function createSparkle(e) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            document.body.appendChild(sparkle);
+
+            const size = Math.random() * 5 + 2;
+            sparkle.style.width = `${size}px`;
+            sparkle.style.height = `${size}px`;
+            
+            const startX = e.clientX;
+            const startY = e.clientY;
+            
+            sparkle.style.left = `${startX}px`;
+            sparkle.style.top = `${startY}px`;
+
+            sparkle.style.animation = 'sparkle 1s forwards';
+            
+            sparkle.addEventListener('animationend', () => {
+                sparkle.remove();
+            });
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() < 0.1) {
+                createSparkle(e);
+            }
+        });
+
+        // Floating particles
+        function createParticle() {
+            const particles = document.querySelector('.particles');
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = '2px';
+            particle.style.height = '2px';
+            particle.style.background = '#1ED760';
+            particle.style.borderRadius = '50%';
+            particle.style.opacity = '0.5';
+            
+            const startX = Math.random() * window.innerWidth;
+            const startY = window.innerHeight;
+            
+            particle.style.left = `${startX}px`;
+            particle.style.top = `${startY}px`;
+            
+            const animation = particle.animate([
+                { transform: `translate(0, 0)` },
+                { transform: `translate(${Math.random() * 100 - 50}px, -${window.innerHeight}px)` }
+            ], {
+                duration: Math.random() * 3000 + 2000,
+                easing: 'linear'
+            });
+            
+            particles.appendChild(particle);
+            
+            animation.onfinish = () => {
+                particle.remove();
+            };
+        }
+
+        setInterval(createParticle, 100);
+    </script>
+</body>
+</html>

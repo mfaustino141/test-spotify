@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>Past Wraps</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Literata:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Literata', serif;
+        }
+        
+        .theme-toggle {
+            position: relative;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 1000;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .theme-toggle .icon {
+            width: 24px;
+            height: 24px;
+            color: var(--text-color);
+        }
+        
+        .generate-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+        }
+        
+        .generate-container .buttons {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem; /* Allow wrapping of buttons on smaller screens */
+            width: 100%;
+            padding: 0 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .generate-container .buttons {
+                flex-direction: column; /* Stack buttons vertically on smaller screens */
+                gap: 1rem; /* Increase gap between buttons */
+                width: 100%;
+            }
+            
+            .button {
+                width: 100%; /* Ensure buttons take full width on mobile */
+                max-width: 300px; /* Limit max width of buttons */
+            }
+        }
+
+        .button {
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 15px 30px;
+            border-radius: 10px;
+            background-color: #7209b7;
+            color: white;
+            text-align: center;
+            transform: scale(1);
+        }
+        
+        .button:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+        
+        .button:active {
+            transform: scale(0.95);
+        }
+
+        #delete-btn, #home-btn {
+            margin-left: 10px;
+        }
+        
+        #delete-btn {
+            background-color: red;
+        }
+        
+        .wrapped-cards-container {
+            height: 400px;
+            width: 100%;
+            max-width: 600px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            margin-top: 1rem;
+        }
+        
+        .wrapped-card {
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            position: relative;
+        }
+        
+        /* Improved mobile text styling for wrapped cards */
+        @media (max-width: 480px) {
+            .wrapped-card {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 15px;
+                gap: 0.5rem;
+            }
+        
+            .wrapped-card h2 {
+                font-size: 1.25rem;  /* Slightly smaller title */
+                margin-bottom: 0.25rem;  /* Reduce margin */
+                line-height: 1.3;  /* Improve line height */
+                max-width: 100%;  /* Ensure full width */
+                word-break: break-word;  /* Break long words */
+                overflow-wrap: break-word;  /* Ensure text wraps */
+            }
+        
+            .wrapped-card p {
+                font-size: 0.9rem;  /* Smaller body text */
+                line-height: 1.4;  /* Tighter line height */
+                word-break: break-word;  /* Prevent text overflow */
+                overflow-wrap: break-word;  /* Ensure long words break */
+                max-width: 100%;  /* Ensure full width */
+                color: rgba(255,255,255,0.8);  /* Slightly softer text color */
+            }
+        }
+        
+        /* Additional responsive text adjustments for very small screens */
+        @media (max-width: 375px) {
+            .wrapped-card h2 {
+                font-size: 1.1rem;
+            }
+        
+            .wrapped-card p {
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Ensure consistent text handling across different screen sizes */
+        .wrapped-card h2, 
+        .wrapped-card p {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+        
+        /* Improve touch target and spacing */
+        .wrapped-card {
+            transition: all 0.3s ease;
+            will-change: transform, box-shadow;
+            touch-action: manipulation;
+        }
+
+        .wrapped-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 20px rgba(114, 9, 183, 0.3);
+            background-color: rgba(255,255,255,0.15);
+        }
+        
+        .wrapped-card:hover::before {
+            left: 100%;
+        }
+        
+        .wrapped-card:active {
+            transform: scale(0.98);
+        }
+
+        /* Custom scrollbar */
+        .wrapped-cards-container::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .wrapped-cards-container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        
+        .wrapped-cards-container::-webkit-scrollbar-thumb {
+            background: #7209b7;
+            border-radius: 10px;
+        }
+        
+        .wrapped-cards-container::-webkit-scrollbar-thumb:hover {
+            background: #5a0c8c;
+        }
+    </style>
+</head>
+<body class="bg-[#23063A] min-h-screen flex flex-col justify-between">
+    <!-- Persistent Banner at the Top -->
+    <header class="relative">
+        <div class="banner flex justify-end items-center py-4 px-8" style="background-color: var(--banner-color);">
+            <div class="flex items-center">
+                <button id="theme-toggle" class="theme-toggle mr-4" onclick="toggleTheme()">
+                    <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                    </svg>
+                </button>
+                <a href="{% url 'profile' %}" class="hover:underline text-white profile-link">Profile</a>
+            </div>
+        </div>
+        <!-- SVG for the wave effect -->
+        <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none wave">
+            <svg class="relative block w-full h-12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                <path fill="currentColor" fill-opacity="1" d="M0,160L1440,320L1440,320L0,320Z"></path>
+            </svg>
+        </div>
+
+        <div class="background-design-1"></div>
+        <div class="background-design-2"></div>
+        <div class="background-design-3"></div>
+        <div class="background-design-4"></div>
+        <div class="background-design-5"></div>
+    </header>
+
+    <!-- Main Container for Decorative Elements and Content -->
+    <div class="main-container flex flex-col items-center justify-center relative flex-grow">
+        <!-- Main Content -->
+        <h1 class="text-white text-4xl font-bold mb-8" style="margin-top: 30px">View Your Wraps</h1>
+        <div class="generate-container">
+            <div class="buttons sm:flex-col gap-4">
+                <button id="generate-btn" class="button">Generate Wrapped</button>
+                <button id="home-btn" class="button" onclick="window.location.href = '/';">Home</button>
+                <button id="delete-btn" class="button">Delete all?</button>
+            </div>
+            <div class="wrapped-cards-container" id="wrapped-container">
+                <!-- Dynamic cards will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center bg-gray-800 text-white py-4">
+        <p>&copy; 2024 Your Project</p>
+    </footer>
+
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.getElementById('theme-toggle');
+            const isDarkMode = !body.classList.contains('light-mode');
+            
+            if (isDarkMode) {
+                body.classList.add('light-mode');
+                button.innerHTML = '<svg class="icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.remove('light-mode');
+                button.innerHTML = '<svg class="icon" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/></svg>';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Apply saved theme on page load
+        function applyTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const body = document.body;
+            const button = document.getElementById('theme-toggle');
+            
+            if (savedTheme === 'light') {
+                body.classList.add('light-mode');
+                button.innerHTML = '<svg class="icon" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>';
+            } else {
+                button.innerHTML = '<svg class="icon" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/></svg>';
+            }
+        }
+
+        window.addEventListener('load', applyTheme);
+
+        // Generate wrapped functionality
+        document.addEventListener('DOMContentLoaded', async () => {
+            const generateBtn = document.getElementById('generate-btn');
+            const deleteBtn = document.getElementById('delete-btn');
+            const wrappedContainer = document.getElementById('wrapped-container');
+
+            // Fetch previously generated wraps from the backend
+            try {
+                const response = await fetch('/get-wraps/');
+                console.log(response)
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    data.wraps.forEach(wrap => {
+                        const wrappedCard = document.createElement('div');
+                        wrappedCard.classList.add('wrapped-card', 'text-white');
+                        wrappedCard.innerHTML = `
+                            <h2 class="text-2xl font-bold mb-4">Your Wrapped</h2>
+                            <p class="text-xl mb-2">Date: ${wrap.date}</p>
+                            <p class="text-xl">Time: ${wrap.time}</p>
+                        `;
+                        wrappedCard.onclick = () => {
+                            window.location.href = `/in-year-you`; // Adjust the target URL as needed
+                        };
+                        wrappedContainer.appendChild(wrappedCard);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading past wraps:', error);
+            }
+
+            generateBtn.addEventListener('click', async () => {
+                try {
+                    // Send a POST request to generate a new SpotifyWrapped instance
+                    const response = await fetch('/generate-wrapped/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCsrfToken(), // Include CSRF token for security
+                        },
+                    });
+        
+                    if (!response.ok) {
+                        throw new Error('Failed to generate wrapped');
+                    }
+        
+                    const data = await response.json();
+        
+                    if (data.status === 'success') {
+                        // Get current date and time
+                        const now = new Date();
+                        const dateString = now.toLocaleDateString('en-US', {
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric'
+                        });
+                        const timeString = now.toLocaleTimeString('en-US', {
+                            hour: '2-digit', 
+                            minute: '2-digit', 
+                            second: '2-digit'
+                        });
+
+                        // Create a new wrapped card
+                        const wrappedCard = document.createElement('div');
+                        wrappedCard.classList.add('wrapped-card', 'text-white');
+                        wrappedCard.innerHTML = `
+                            <h2 class="text-2xl font-bold mb-4">Your Wrapped</h2>
+                            <p class="text-xl mb-2">Date: ${dateString}</p>
+                            <p class="text-xl">Time: ${timeString}</p>
+                        `;
+
+                        wrappedCard.onclick = () => {
+                            window.location.href = `/in-year-you`; // Adjust the target URL as needed
+                        };
+                        // Add the new card to the container
+                        wrappedContainer.insertBefore(wrappedCard, wrappedContainer.firstChild);
+
+                        // Scroll to the top of the container
+                        wrappedContainer.scrollTop = 0;
+                    }
+                } catch (error) {
+                    console.error('Error generating wrapped:', error);
+                }
+            });
+
+            deleteBtn.addEventListener('click', async () => {
+                try {
+                    // Send a POST request to delete all wraps
+                    const response = await fetch('/delete-all-wraps/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCsrfToken(), // Include CSRF token for security
+                        },
+                    });
+        
+                    const data = await response.json();
+        
+                    if (data.status === 'success') {
+                        // Handle success (e.g., show a success message)
+                        location.reload(); 
+                    } else {
+                        // Handle error
+                        alert(data.message);
+                    }
+                } catch (error) {
+                    console.error('Error deleting all wraps:', error);
+                    alert('An error occurred while deleting your wraps.');
+                }
+            });
+        });     
+
+        function getCsrfToken() {
+            const name = 'csrftoken';
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    return cookie.slice(name.length + 1);
+                }
+            }
+            return '';
+        }
+        window.addEventListener('load', applyTheme);
+    </script>
+</body>
+</html>

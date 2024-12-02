@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover Your Music Personality</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #500750 0%, #4c0747 50%, #450740 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 900px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .title {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            background: linear-gradient(90deg, #1ED760, #FFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .card h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #1ED760;
+        }
+
+        .card p {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .button {
+            display: inline-block;
+            background: #1ED760;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.5rem;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(30, 215, 96, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(30, 215, 96, 0.5);
+        }
+
+        #personality-description {
+            margin-top: 2rem;
+            font-size: 1.8rem;
+            line-height: 1.6;
+            color: #1ED760;
+        }
+
+        footer {
+            margin-top: 3rem;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        footer a {
+            color: #1ED760;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Explore your musicality</h1>
+        <p class="subtitle">Figure out your unique personality through Spotify Wrapped!</p>
+
+        <div class="card">
+            <h2>How does someone who listen to my kind of music tend to act/think/dress?</h2>
+            <p>Click below to find out how your music taste reflects your personality!</p>
+            <button class="button" onclick="getMusicPersonality()">Get My Personality</button>
+            <p id="personality-description"></p>
+        </div>
+
+        <footer>
+            <p>Powered by Spotify Wrapped & OpenAI. <a href="/">Back to Home</a></p>
+        </footer>
+    </div>
+
+    <script>
+        async function getMusicPersonality() {
+            const elem = document.getElementById('personality-description');
+            elem.textContent = 'Loading your music personality...';
+
+            try {
+                const response = await fetch('/api/music-personality/');
+                const data = await response.json();
+
+                if (response.ok) {
+                    elem.textContent = data.description;
+                } else {
+                    elem.textContent = data.error || 'Failed to fetch personality. Please try again later.';
+                }
+            } catch (error) {
+                elem.textContent = 'An error has happened. Please try again later.';
+            }
+        }
+    </script>
+</body>
+</html>

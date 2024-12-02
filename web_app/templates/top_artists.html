@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Favorite Artists</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #500750 0%, #4c0747 50%, #450740 100%);
+            color: white;
+            overflow-x: hidden;
+            padding: 2rem 1rem;
+        }
+
+        .background-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(29, 215, 96, 0.2) 0%, transparent 70%);
+            animation: float 8s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1000px; /* Increased max-width */
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: slideDown 0.5s ease-out forwards;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #1ED760, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .artist-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 6rem;
+            margin: 5rem auto;
+        }
+
+        .artist-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .artist-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(29, 215, 96, 0.3);
+        }
+
+        .artist-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .artist-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .artist-pic {
+            width: 250px;
+            height: 250px;
+            border-radius: 24px;
+            background: #333;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 15px 30px rgba(29, 215, 96, 0.3);
+        }
+
+        .artist-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .artist-pic::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(29, 215, 96, 0.2), transparent);
+        }
+
+        .rank {
+            position: static; /* Remove absolute positioning */
+            text-align: center; /* Center the rank */
+            width: 100%; /* Ensure full width */
+            margin-bottom: 1rem; /* Space between rank and image */
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #1ED760;
+            text-shadow: 0 0 15px rgba(29, 215, 96, 0.4);
+        }
+
+        .artist-name {
+            font-weight: bold;
+            font-size: 1.5rem;
+            text-align: center;
+            color: white;
+        }
+
+        .next-button-container {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .next-button {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(90deg, #1ED760, #17c15e);
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.25rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(29, 215, 96, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .next-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(29, 215, 96, 0.4);
+        }
+        
+        .next-button .icon {
+            width: 24px;
+            height: 24px;
+            margin-left: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .next-button:hover .icon {
+            transform: translateX(5px);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -30px); }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                max-width: 90%;
+                padding: 0 1rem;
+            }
+        
+            .artist-grid {
+                gap: 1.5rem;
+            }
+        
+            .artist-pic {
+                width: 200px;
+                height: 200px;
+            }
+        
+            .artist-name {
+                font-size: 1.3rem;
+            }
+        
+            .rank {
+                font-size: 3rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .artist-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+        
+            .artist-pic {
+                width: 180px;
+                height: 180px;
+            }
+        
+            .artist-name {
+                font-size: 1.2rem;
+            }
+        
+            .rank {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+        
+            .artist-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        
+            .artist-pic {
+                width: 250px;
+                height: 250px;
+            }
+        
+            .artist-name {
+                font-size: 1.3rem;
+            }
+        
+            .rank {
+                font-size: 2.7rem;
+            }
+        
+            .title {
+                font-size: 2.2rem;
+            }
+        
+            .subtitle {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 375px) {
+            .artist-pic {
+                width: 220px;
+                height: 220px;
+            }
+        
+            .title {
+                font-size: 2rem;
+            }
+        
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        @keyframes slideOut {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .page-exit {
+            animation: slideOut 0.5s forwards;
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(0); }
+        }
+
+        .page-enter {
+            animation: slideIn 0.5s forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-glow"></div>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Your Top Artists</h1>
+            <p class="subtitle">These were your most listened to artists this year</p>
+        </header>
+        
+        <div class="artist-grid">
+            <!-- Artists will be added here by JavaScript -->
+        </div>
+
+        <div class="next-button-container">
+            <a href="/llm-transition" class="next-button"> 
+                Next
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        async function fetchTopArtists() {
+            try {
+                const response = await fetch('/api/top-artists/');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+    
+                if (data.items && Array.isArray(data.items)) {
+                    return data.items;
+                } else {
+                    throw new Error('Expected "items" to be an array in the response');
+                }
+            } catch (error) {
+                console.error('Error fetching top artists:', error);
+                return [];  
+            }
+        }
+    
+        async function getArtistDetails(artist) {
+            const imageUrl = artist.images && artist.images.length > 0 ? artist.images[0].url : '/api/placeholder/64/6';
+            return {
+                name: artist.name,
+                image: imageUrl
+            };
+        }
+    
+        async function populateTopArtists() {
+            const artists = await fetchTopArtists(); 
+            if (!artists || artists.length === 0) {
+                console.log('No top artists data available!');
+                return [];
+            }
+    
+            // Process all artists concurrently
+            const topArtists = await Promise.all(artists.slice(0, 3).map(async (artist, index) => {
+                return {
+                    rank: index + 1,
+                    ...await getArtistDetails(artist)
+                };
+            }));
+    
+            return topArtists;
+        }
+    
+        function createArtistCard(artist, index) {
+            const card = document.createElement('div');
+            card.className = 'artist-card';
+            card.style.animationDelay = `${index * 0.1}s`;
+    
+            card.innerHTML = `
+                <div class="rank">#${artist.rank}</div>
+                <div class="artist-pic">
+                    <img src="${artist.image}" alt="${artist.name} image">
+                </div>
+                <div class="artist-name">${artist.name}</div>
+            `;
+    
+            return card;
+        }
+    
+        async function createArtistCards() {
+            const topArtists = await populateTopArtists(); 
+    
+            if (topArtists && topArtists.length > 0) {
+                const artistGrid = document.querySelector('.artist-grid');
+                topArtists.forEach((artist, index) => {
+                    artistGrid.appendChild(createArtistCard(artist, index)); 
+                });
+            }
+        }
+    
+        createArtistCards(); 
+    </script>
+
+    <script>
+        // Existing navigation scripts remain the same
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.add('page-enter');
+        });
+    
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                const href = event.target.closest('a').getAttribute('href');
+    
+                document.body.classList.add('page-exit');
+    
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html>

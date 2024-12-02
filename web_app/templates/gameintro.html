@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Wrapped Game</title>
+    <link rel="stylesheet" href="{% static 'css/gameintro.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/gamestart.js' %}" defer></script>
+</head>
+<body>
+    {% comment %} <header>
+        <nav>
+            <a href="#">Welcome</a>
+            <a href="{% url 'spotify_login' %}">Login with Spotify</a>
+            <a href="#">Profile</a>
+        </nav>
+    </header> {% endcomment %}
+    <div class="welcome-container">
+        <h1>Spotify Heardle!</h1>
+        <p>Guess a song from your favorite artist, playlist, or album based on a clip from its intro!</p> 
+    </div>
+    <div style="margin-top: 20px;">
+        
+    <div id="short-notification" class="notification hidden">
+        <span id="short-notification-message"></span>
+    </div>
+
+    <main>
+        <div id="content">
+            <div id="select-div">
+                <select id="select" name="select">
+                    <option value="0" hidden disabled selected>Pick your preference...</option>
+                    <option value="1">Artist (by name)</option>
+                    <option value="2">Artist (by ID)</option>
+                    <option value="3">Playlist (by name)</option>
+                    <option value="4">Playlist (by ID)</option>
+                    <option value="5">By Album (by name)</option>
+                    <option value="6">By Album (by ID)</option>
+                    <option value="7">Specific song</option>
+                    <option value="8">My top 50 songs</option>
+                    <option value="9">My liked songs</option>
+                </select>
+                <textarea id="textarea" rows="1" disabled></textarea>
+            </div>
+            <button id="button">Done</button>
+            <button id="button" style="margin-top: 20px; background: red" onclick="window.location.href='{% url 'welcome' %}'">
+                Back to Home
+            </button>
+        </div>
+    </main>
+
+    <pre id="result" style="margin-top: 20px;"></pre>
+    {% comment %} <footer>
+        <p>© 2024 Your Project</p>
+    </footer> {% endcomment %}
+</body>
+</html>

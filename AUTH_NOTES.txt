@@ -1,0 +1,22 @@
+Backend/Implementation
+- The database model's SESSION will consist of a username, password, and access_token, refresh_token, time_obtained, expires_in
+
+Auth Middleware
+- The middleware will be responsible for ensuring only logged in users can acccess pages that require logging in
+1. If a request is made from a user that is not logged in, redirect them to the login page
+2. If the user is logged in, check if a spotify access token exists (in session) and is valid
+    a. If the the spotify access token is valid, move to step 3
+    b. If the spotify access token does not exist, direct to spotify auth login page to obtain new access token and refresh token
+    c. If the spotify access token exists but is not valid (expired), use the refresh token to obtain new access/refresh tokens
+3. Allow access to the next middleware/view
+
+Register Page
+1. If a user is already logged in when they request the register page, simply redirect to the homepage
+2. Otherwise, send register page
+3. After having the user register their username/password, redirect to homepage and this 
+   should trigger the middleware to bring them to the spotify login page for access/refresh tokens
+
+
+Login Page
+1. If a user is already logged in when they request the login page, simply redirect to the homepage
+2. Otherwise, send login page and then redirect to homepage

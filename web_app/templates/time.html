@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Wrapped - Time</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #500750 0%, #4c0747 50%, #450740 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .background-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(29, 215, 96, 0.2) 0%, transparent 70%);
+            animation: float 8s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 24px;
+            animation: fadeIn 1s ease-out;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(29, 215, 96, 0.1) 0%, transparent 50%);
+            animation: rotate 15s linear infinite;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #1ED760;
+            border-radius: 50%;
+            animation: sparkle 2s infinite;
+        }
+
+        .icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1rem;
+            fill: #1ED760;
+            filter: drop-shadow(0 0 10px rgba(29, 215, 96, 0.5));
+            animation: pulse 2s infinite;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: slideUp 0.5s ease-out forwards;
+            animation-delay: 0.5s;
+            text-shadow: 0 0 20px rgba(29, 215, 96, 0.3);
+        }
+
+        .time-section {
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .time-section::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #1ED760, transparent);
+        }
+
+        .number {
+            font-size: 4.5rem;
+            font-weight: bold;
+            color: #1ED760;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: slideUp 0.5s ease-out forwards;
+            text-shadow: 0 0 20px rgba(29, 215, 96, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .number:hover {
+            transform: scale(1.1);
+        }
+
+        .label {
+            font-size: 1rem;
+            opacity: 0;
+            animation: slideUp 0.5s ease-out forwards;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .days .number, .days .label { animation-delay: 1s; }
+        .hours .number, .hours .label { animation-delay: 1.5s; }
+        .minutes .number, .minutes .label { animation-delay: 2s; }
+
+        .footer {
+            font-size: 1.25rem;
+            margin-top: 2rem;
+            opacity: 0;
+            animation: slideUp 0.5s ease-out forwards;
+            animation-delay: 2.5s;
+            background: linear-gradient(90deg, #1ED760, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+        }
+
+        .next-button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .next-button {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(90deg, #1ED760, #17c15e);
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.25rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(29, 215, 96, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .next-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(29, 215, 96, 0.4);
+        }
+        
+        .next-button .icon {
+            width: 24px;
+            height: 24px;
+            margin-left: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .next-button:hover .icon {
+            transform: translateX(5px);
+        }
+        
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -30px); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 480px) {
+            .number {
+                font-size: 3.5rem;
+            }
+            .title {
+                font-size: 1.25rem;
+            }
+            .footer {
+                font-size: 1rem;
+            }
+        }
+
+        @keyframes slideOut {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .page-exit {
+            animation: slideOut 0.5s forwards;
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .page-enter {
+            animation: slideIn 0.5s forwards;
+}
+    </style>
+</head>
+<body>
+    <div class="background-glow"></div>
+    <div class="container">
+        <div class="card">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" />
+            </svg>
+            <h2 class="title">This year, you spent</h2>
+            
+            <div class="time-section days">
+                <div class="number" id="days">0</div>
+                <div class="label">days</div>
+            </div>
+            
+            <div class="time-section hours">
+                <div class="number" id="hours">0</div>
+                <div class="label">hours</div>
+            </div>
+            
+            <div class="time-section minutes">
+                <div class="number" id="minutes">0</div>
+                <div class="label">minutes</div>
+            </div>
+
+            <div class="next-button-container">
+                <a href="/aura" class="next-button">
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </div>
+            
+            <p class="footer">listening to your favorite music</p>
+        </div>
+    </div>
+
+    <script>
+        // Add sparkles dynamically
+        function createSparkles() {
+            const card = document.querySelector('.card');
+            for (let i = 0; i < 20; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                card.appendChild(sparkle);
+            }
+        }
+
+        // Example: Total minutes of listening time (about 34 days)
+        const totalMinutes = 48921;
+
+        // Convert to days, hours, minutes
+        const days = Math.floor(totalMinutes / (24 * 60));
+        const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+        const minutes = totalMinutes % 60;
+
+        // Animate numbers with improved easing
+        function animateNumber(element, target, duration = 2000) {
+            const start = Date.now();
+            const startValue = 0;
+            
+            function update() {
+                const now = Date.now();
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Improved easing function for more dynamic animation
+                const easeOutBack = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress) * Math.sin((progress * 10 - 0.75) * ((2 * Math.PI) / 3));
+                const current = Math.floor(startValue + (target - startValue) * easeOutBack);
+                
+                element.textContent = current;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            update();
+        }
+
+        // Start animations after delays matching the CSS animations
+        setTimeout(() => animateNumber(document.getElementById('days'), days), 1000);
+        setTimeout(() => animateNumber(document.getElementById('hours'), hours), 1500);
+        setTimeout(() => animateNumber(document.getElementById('minutes'), minutes), 2000);
+
+        // Create sparkles when the page loads
+        createSparkles();
+    </script>
+
+    <script>
+        // Apply the slide-in animation on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.add('page-enter');
+        });
+    
+      
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                const href = event.target.closest('a').getAttribute('href');
+    
+                document.body.classList.add('page-exit');
+    
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html>
